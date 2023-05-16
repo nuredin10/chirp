@@ -7,9 +7,11 @@ import { SignIn, SignInButton, useUser } from "@clerk/nextjs";
 import { SignOutButton } from "@clerk/clerk-react";
 
 const Home: NextPage = () => {
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
-
   const user = useUser();
+
+  const { data } = api.posts.getAll.useQuery();
+
+  console.log(data);
 
   return (
     <>
@@ -20,11 +22,17 @@ const Home: NextPage = () => {
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center ">
         <div>
-          {!user.isSignedIn && <SignInButton/>}
-          {!!user.isSignedIn && <SignOutButton/>}
+          {!user.isSignedIn && <SignInButton />}
+          {!!user.isSignedIn && <SignOutButton />}
           {/*<SignInButton></SignInButton>*/}
         </div>
-        <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
+    <div>
+      {
+        data?.map((post) =>(
+          <div key={post.id}>{post.content }</div>
+        ))
+      }
+    </div>
       </main>
     </>
   );
