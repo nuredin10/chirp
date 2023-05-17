@@ -1,9 +1,10 @@
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
+import Image from "next/image";
 
 import { RouterOutputs, api } from "~/utils/api";
-import { SignIn, SignInButton, useUser } from "@clerk/nextjs";
+import { SignIn, SignInButton, auth, useUser } from "@clerk/nextjs";
 import { SignOutButton } from "@clerk/clerk-react";
 import { RouterOptions } from "next/dist/server/router";
 
@@ -19,7 +20,7 @@ const CreatePostWizard = () => {
 
   return (
     <div className='flex w-full gap-3'>
-      <img src={user.profileImageUrl} alt='profile image' className='w-14 h-14 rounded-full' />
+      <Image width={56} height={56} src={user.profileImageUrl} alt='profile image' className='w-14 h-14 rounded-full' />
       <input placeholder='Type some emojis!' className='outline-none bg-transparent grow' />
     </div>
   )
@@ -33,11 +34,11 @@ const PostView = (props: PostWithUser) => {
 
   return (
     <div key={post.id} className='flex gap-3 p-4 border-b border-slate-400'>
-      <img src={author.profileImageUrl} className='w-14 h-14 rounded-full' />
+      <Image width={56} height={56} alt={`@${author.username}`} src={author.profileImageUrl} className='w-14 h-14 rounded-full' />
       <div className="flex flex-col">
         <div className="flex g ap-1 text-slate-300">
-          <span>{`@${author.username} `}</span> 
-          <span className="font-thin">{` · ${dayjs(post.createdAt).fromNow()}`}</span> 
+          <span>{`@${author.username} `}</span>
+          <span className="font-thin">{` · ${dayjs(post.createdAt).fromNow()}`}</span>
         </div>
         <span>{post.content}</span>
       </div>
