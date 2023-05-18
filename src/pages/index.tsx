@@ -7,7 +7,7 @@ import { RouterOutputs, api } from "~/utils/api";
 import { SignIn, SignInButton, auth, useUser } from "@clerk/nextjs";
 import { SignOutButton } from "@clerk/clerk-react";
 import { RouterOptions } from "next/dist/server/router";
-
+import { toast } from "react-hot-toast";
 import dayjs from "dayjs"
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { LoadingPage, LoadingSpinner } from "~/components/loading";
@@ -25,6 +25,15 @@ const CreatePostWizard = () => {
     onSuccess: ()=>{
       setInput('');
       void ctx.posts.getAll.invalidate()
+    },
+
+    onError: (e)=>{
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if(errorMessage && errorMessage[0]){
+        toast.error(errorMessage[0])
+      } else{
+        toast.error('Failed to post! Please try again later.')
+      }
     }
   })
 
@@ -34,8 +43,25 @@ const CreatePostWizard = () => {
   return (
     <div className='flex w-full gap-3'>
       <Image width={56} height={56} src={user.profileImageUrl} alt='profile image' className='w-14 h-14 rounded-full' />
-      <input disabled={isPosting} type="text"  value={input} onChange={(e) => setInput(e.target.value)} placeholder='Type some emojis!' className='outline-none bg-transparent grow' />
+      <input disabled={isPosting} type="text"  value={input}
+      onKeyDown={(e) =>{
+        if(e.key === 'Enter'){
+          e.preventDefault();
+          if(input !== ''){
+          mutate({content: input})
+          }
+        }  
+      }}
+      onChange={(e) => setInput(e.target.value)} placeholder='Type some emojis!' className='outline-none bg-transparent grow' />
+     { input !== ''&& !isPosting && (
+
       <button onClick={()=>mutate({content: input})}>Post</button>
+     )} 
+
+     {
+      isPosting && <div className="flex items-center justify-center "><LoadingSpinner size={20}/></div>
+     }
+
     </div>
   )
 }
